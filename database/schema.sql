@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.46, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.46, for Linux (x86_64)
 --
 -- Host: localhost    Database: lamp_db
 -- ------------------------------------------------------
--- Server version	8.0.46
+-- Server version	8.0.46-0ubuntu0.24.04.4
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -16,63 +16,65 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `contacts`
+-- Table structure for table `Contacts`
 --
 
-DROP TABLE IF EXISTS `contacts`;
+DROP TABLE IF EXISTS `Contacts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `contacts` (
+CREATE TABLE `Contacts` (
   `ID` int NOT NULL AUTO_INCREMENT,
   `FirstName` varchar(50) NOT NULL,
   `LastName` varchar(50) NOT NULL,
-  `Phone` varchar(20) NOT NULL,
   `Email` varchar(100) NOT NULL,
+  `Phone` varchar(20) DEFAULT NULL,
+  `DateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `DateUpdated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `UserID` int NOT NULL,
   PRIMARY KEY (`ID`),
   KEY `UserID` (`UserID`),
-  CONSTRAINT `contacts_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`id`) ON DELETE CASCADE
+  CONSTRAINT `Contacts_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `Users` (`ID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `contacts`
+-- Dumping data for table `Contacts`
 --
 
-LOCK TABLES `contacts` WRITE;
-/*!40000 ALTER TABLE `contacts` DISABLE KEYS */;
-INSERT INTO `contacts` VALUES (1,'John','Doe','555-123-4567','john@example.com',1),(2,'Jane','Smith','555-987-6543','jane@example.com',1);
-/*!40000 ALTER TABLE `contacts` ENABLE KEYS */;
+LOCK TABLES `Contacts` WRITE;
+/*!40000 ALTER TABLE `Contacts` DISABLE KEYS */;
+INSERT INTO `Contacts` VALUES (1,'Jane','Smith','jsmith@example.com','123 456-7890','2026-09-09 22:50:08','2026-09-09 22:50:08',1),(2,'Michael','Johnson','mjohnson@example.com','666 777-888','2026-09-09 22:50:08','2026-09-09 22:50:08',1);
+/*!40000 ALTER TABLE `Contacts` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `users`
+-- Table structure for table `Users`
 --
 
-DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `Users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `users` (
-  `id` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `Users` (
+  `ID` int NOT NULL AUTO_INCREMENT,
   `FirstName` varchar(50) NOT NULL,
   `LastName` varchar(50) NOT NULL,
   `Login` varchar(50) NOT NULL,
-  `Email` varchar(100) NOT NULL,
   `Password` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `Email` (`Email`),
+  `DateCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `DateUpdated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ID`),
   UNIQUE KEY `Login` (`Login`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `users`
+-- Dumping data for table `Users`
 --
 
-LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'John','Aedo','jaedo','jaedo@example.com','$2f$1e$e8.samplehashforpasswordhere');
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+LOCK TABLES `Users` WRITE;
+/*!40000 ALTER TABLE `Users` DISABLE KEYS */;
+INSERT INTO `Users` VALUES (1,'John','Doe','jdoe123','somehash.@#!eeadba','2026-09-09 22:38:56','2026-09-09 22:38:56');
+/*!40000 ALTER TABLE `Users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -84,4 +86,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-09-05 13:33:38
+-- Dump completed on 2026-09-09 22:51:50
