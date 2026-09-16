@@ -25,7 +25,7 @@ if($conn->connect_error){
 }
 
 //sql query
-$stmt = $conn->prepare("SELECT ID, FirstName, LastName, Password FROM Users WHERE Login = ?");
+$stmt = $conn->prepare("SELECT ID, FirstName, LastName, Password, role FROM Users WHERE Login = ?");
 $stmt->bind_param("s", $inDataL["login"]);
 $stmt->execute();
 
@@ -34,12 +34,13 @@ $result = $stmt->get_result();
 $row = $result->fetch_assoc();
 
 // error check then send data to client
-if($row != NULL && password_verify($inDataL["password"], $row["Password"])){
+if($row && password_verify($inDataL["password"], $row["Password"])){
     http_response_code(200);
     echo json_encode([
         "id" => $row["ID"],
         "firstName" => $row["FirstName"],
         "lastName" => $row["LastName"],
+        "role"     => $row["role"],
         "error" => ""
     ]);
 } else{
