@@ -111,18 +111,25 @@ function doLogout() {
 }
 
 function addContact() {
-  let newContactInput = document.getElementById("contactText");
-  let newContact = newContactInput ? newContactInput.value.trim() : "";
+  let firstNameInput = document.getElementById("contactFirstName");
+  let lastNameInput = document.getElementById("contactLastName");
+  let emailInput = document.getElementById("contactEmail");
+  let phoneInput = document.getElementById("contactPhone");
   let resultEl = document.getElementById("contactAddResult");
   resultEl.innerHTML = "";
 
-  if (!newContact) {
+  let firstName = firstNameInput ? firstNameInput.value.trim() : "";
+  let lastName = lastNameInput ? lastNameInput.value.trim() : "";
+  let email = emailInput ? emailInput.value.trim() : "";
+  let phone = phoneInput ? phoneInput.value.trim() : "";
+
+  if (!firstName || !lastName || !email) {
     resultEl.className = "text-warning small fw-semibold";
-    resultEl.innerHTML = "<i class='bi bi-exclamation-triangle-fill me-1'></i> Please enter a contact name";
+    resultEl.innerHTML = "<i class='bi bi-exclamation-triangle-fill me-1'></i> First name, last name, and email are required";
     return;
   }
 
-  let jsonPayload = JSON.stringify({ contact: newContact });
+  let jsonPayload = JSON.stringify({ firstName, lastName, email, phone });
   let url = urlBase;
 
   let xhr = new XMLHttpRequest();
@@ -137,8 +144,15 @@ function addContact() {
         if (this.status === 201 || this.status === 200) {
           resultEl.className = "text-success-wcag small fw-semibold";
           resultEl.innerHTML = "<i class='bi bi-check-circle-fill me-1'></i> Contact successfully added!";
-          newContactInput.value = "";
+          firstNameInput.value = "";
+          lastNameInput.value = "";
+          emailInput.value = "";
+          phoneInput.value = "";
           searchContact();
+
+          let modalEl = document.getElementById("addContactModal");
+          let modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+          modal.hide();
         } else {
           try {
             let res = JSON.parse(xhr.responseText);
