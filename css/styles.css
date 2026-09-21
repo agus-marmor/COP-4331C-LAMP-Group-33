@@ -1,42 +1,97 @@
 /* ============================================================
-   WCAG 2.1 AA / AAA Compliant Modern Theme Styles
+   Group 33 Contacts App — Theme Styles
+   Organized as: tokens -> base -> layout -> components -> utilities
    ============================================================ */
 
+/* ---------- 1. Design Tokens ----------
+   Change a color/spacing value here and it updates everywhere.
+   Keep new colors as variables instead of hardcoding hex values
+   in component rules below — that's what made the old file hard
+   to keep consistent. */
 :root {
     --app-font: 'Inter', system-ui, -apple-system, sans-serif;
-    
-    /* WCAG AA/AAA Compliant Palette Tokens */
-    --bg-dark:#F2F0EF ;
-    --bg-card: #a4ac86;
-    --bg-section: #F2F0EF;
-    --bg-input: #F2F0EF;
 
-    /* High Contrast Text Tokens */
-    --text-primary: #220901;       /* 17.8:1 contrast on card */
-    --text-secondary: #220901;     /* 12.0:1 contrast on card / 9.8:1 on section */
-    --text-muted: #220901;         /* 5.7:1 contrast on section */
-    --text-blue: #0D6efD;
-    
-    /* High Contrast Feedback Contacts */
-    --contact-error: #6a040f;         /* 6.45:1 contrast on card */
-    --contact-success: #386641;       /* 9.29:1 contrast on card */
-    --contact-info: #220901;          /* 6.83:1 contrast on section */
-    
-    /* Button Gradients meeting >= 4.5:1 contrast against #ffffff text */
-    --primary-gradient: linear-gradient(135deg, #05472A 0%, #05472A 100%);
-    --success-gradient: linear-gradient(135deg, #05472A 0%, #05472A 100%);
+    /* Page & surface colors */
+    --bg-page: #F2F0EF;         /* page background */
+    --bg-card: #FFFFFF;         /* main card surface (login card, contact card) */
+    --bg-section: #F7F6F4;      /* nested "section" surfaces inside a card */
+    --bg-input: #FFFFFF;        /* form control background */
+    --border-color: #DDD8D2;    /* shared border tone for cards/inputs */
+
+    /* Text */
+    --text-primary: #1F1B16;    /* headings, primary body text */
+    --text-secondary: #4A443C;  /* labels, secondary copy */
+    --text-muted: #7A7266;      /* placeholders, hints */
+    --text-on-brand: #FFFFFF;   /* text placed on top of --brand */
+
+    /* Brand / accent */
+    --brand: #05472A;
+    --brand-hover: #033a21;
+    --brand-soft: #E7EFEA;      /* light tint of brand, for badges/backgrounds */
+    --link: #0D6EFD;
+
+    /* Feedback colors (kept distinct from brand green so success
+       messages don't visually blend into brand-colored buttons) */
+    --success: #1E7A34;
+    --success-soft: #E9F6EC;
+    --danger: #B3261E;
+    --danger-soft: #FBEAE9;
+    --warning: #8A5A00;
+    --warning-soft: #FBF1DC;
+    --info: #1D4ED8;
+    --info-soft: #EAF0FE;
+
+    /* Shape & elevation */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.85rem;
+    --radius-lg: 1.25rem;
+    --radius-pill: 999px;
+    --shadow-sm: 0 2px 8px rgba(31, 27, 22, 0.06);
+    --shadow-md: 0 10px 25px -5px rgba(31, 27, 22, 0.12);
+    --shadow-lg: 0 25px 50px -12px rgba(31, 27, 22, 0.18);
+
+    --transition-fast: 150ms ease-in-out;
+    --transition-base: 200ms ease-in-out;
+}
+
+/* ---------- 2. Base / Reset ---------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
 body {
     font-family: var(--app-font);
-    background: var(--bg-dark);
+    background: var(--bg-page);
     color: var(--text-primary);
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
 }
 
-/* Background Ambient Glow Effects */
+/* Visible keyboard-focus outline everywhere (accessibility —
+   don't remove without replacing it, screen/keyboard-only users
+   rely on this to know what's focused). Bootstrap's own
+   focus box-shadow on .form-control still applies on top of this. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--link);
+    outline-offset: 2px;
+}
+
+/* Respect reduced-motion preferences instead of forcing transitions */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ---------- 3. Ambient background glow ---------- */
 .background-glow {
     position: fixed;
     top: 50%;
@@ -44,13 +99,24 @@ body {
     transform: translate(-50%, -50%);
     width: 650px;
     height: 650px;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.06) 40%, transparent 70%);
+    background: radial-gradient(circle, rgba(5, 71, 42, 0.08) 0%, rgba(5, 71, 42, 0.03) 40%, transparent 70%);
     z-index: -1;
     pointer-events: none;
     filter: blur(50px);
 }
 
-/* Typography & Titles */
+/* Smaller/cheaper glow on narrow screens — the large blurred
+   radial gradient is pure decoration and not worth the paint
+   cost on low-power mobile devices */
+@media (max-width: 576px) {
+    .background-glow {
+        width: 380px;
+        height: 380px;
+        filter: blur(30px);
+    }
+}
+
+/* ---------- 4. Typography ---------- */
 #title {
     font-family: var(--app-font);
     color: var(--text-primary) !important;
@@ -67,165 +133,314 @@ body {
     letter-spacing: 0.03em;
 }
 
-/* App Icon Badges */
-.app-icon-wrapper {
-    width: 64px;
-    height: 64px;
-    border-radius: 18px;
-    background: var(--primary-gradient);
+/* ---------- 5. Icon badges ---------- */
+.app-icon-wrapper,
+.app-icon-wrapper-sm {
     display: flex;
     align-items: center;
     justify-content: center;
+    background: var(--brand);
+    color: var(--text-on-brand);
+    box-shadow: var(--shadow-md);
+}
+
+.app-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-md);
     font-size: 2rem;
-    color: #DED7C2;
-    box-shadow: 0 10px 25px -5px #05472A;
 }
 
 .app-icon-wrapper-sm {
     width: 42px;
     height: 42px;
-    border-radius: 12px;
-    background: var(--primary-gradient);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border-radius: var(--radius-sm);
     font-size: 1.25rem;
-    color: #DED7C2;
-    box-shadow: 0 4px 14px #05472A;
 }
 
-/* Glassmorphism Cards */
+/* ---------- 6. Cards & surfaces ---------- */
 .glass-card {
-    background: #C7BEBA !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    border-radius: 1.25rem !important;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6) !important;
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-lg) !important;
 }
 
 .section-card {
     background: var(--bg-section) !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-md);
 }
 
-/* Form Controls, Inputs & High Contrast Placeholders */
+/* ---------- 7. Forms ---------- */
 .form-control {
     background-color: var(--bg-input) !important;
     color: var(--text-primary) !important;
-    border: 1px solid var(--text-muted) !important;
+    border: 1px solid var(--border-color) !important;
     font-family: var(--app-font);
     padding: 0.75rem 1rem;
     font-size: 0.95rem;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .form-control::placeholder {
     color: var(--text-muted) !important;
-    opacity: 1 !important; /* 5.71:1 contrast ratio */
+    opacity: 1 !important;
 }
 
 .form-control:focus {
-    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.35) !important;
-    border-color: #818cf8 !important;
+    box-shadow: 0 0 0 3px rgba(5, 71, 42, 0.18) !important;
+    border-color: var(--brand) !important;
+}
+
+/* Validation states — add class="is-invalid" / "is-valid" to a
+   .form-control from JS once you're doing real client-side
+   validation; Bootstrap's default colors are low-contrast on this
+   theme, so these override them to match the token palette. */
+.form-control.is-invalid {
+    border-color: var(--danger) !important;
+}
+
+.form-control.is-valid {
+    border-color: var(--success) !important;
+}
+
+.invalid-feedback {
+    color: var(--danger) !important;
 }
 
 .input-group-text {
-    background-color: #C7BEBA !important;
+    background-color: var(--bg-section) !important;
     color: var(--text-secondary) !important;
-    border: 1px solid var(--text-muted) !important;
+    border: 1px solid var(--border-color) !important;
 }
 
-/* WCAG Compliant Button Styles */
+/* Disabled controls should look obviously inert */
+.form-control:disabled,
+.form-control[readonly] {
+    background-color: var(--bg-section) !important;
+    color: var(--text-muted) !important;
+    cursor: not-allowed;
+}
+
+/* ---------- 8. Buttons ---------- */
 .btn {
     font-family: var(--app-font);
-    transition: all 0.2s ease-in-out;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+}
+
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
 .btn-primary {
-    background: var(--primary-gradient) !important;
-    color: #ffffff !important; /* 9.9:1 contrast ratio */
+    background: var(--brand) !important;
+    color: var(--text-on-brand) !important;
     border: none;
-    box-shadow: 0 4px 14px rgba(55, 48, 163, 0.4);
+    box-shadow: 0 4px 14px rgba(5, 71, 42, 0.35);
 }
 
-.btn-signup:hover {
+.btn-primary:hover {
+    background: var(--brand-hover) !important;
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(55, 48, 163, 0.6);
-    background: linear-gradient(135deg, #3730a3 0%, #312e81 100%) !important;
+    box-shadow: 0 6px 20px rgba(5, 71, 42, 0.45);
 }
-
-
-.btn-signup {
-    color: var(--text-blue) !important; /* 5.29:1 contrast ratio */
-    border-color: var(--text-blue) !important;
-    background: transparent;
-}
-
-.btn-secondary:hover {
-    color: #ffffff !important;
-    background-color: var(--text-blue) !important;
-    border-color: var(--text-blue) !important;
-}
-
 
 .btn-success {
-    background: var(--success-gradient) !important;
-    color: #ffffff !important; /* 5.48:1 contrast ratio */
+    background: var(--success) !important;
+    color: var(--text-on-brand) !important;
     border: none;
-    box-shadow: 0 4px 14px rgba(4, 120, 87, 0.4);
+    box-shadow: 0 4px 14px rgba(30, 122, 52, 0.35);
 }
 
 .btn-success:hover {
+    background: #175c27 !important;
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(4, 120, 87, 0.6);
-    background: linear-gradient(135deg, #047857 0%, #065f46 100%) !important;
+    box-shadow: 0 6px 20px rgba(30, 122, 52, 0.45);
+}
+
+.btn-signup {
+    color: var(--link) !important;
+    border-color: var(--link) !important;
+    background: transparent;
+}
+
+.btn-signup:hover {
+    color: #ffffff !important;
+    background: var(--link) !important;
+    transform: translateY(-1px);
 }
 
 .btn-outline-danger {
-    color: var(--contact-error) !important; /* 5.29:1 contrast ratio */
-    border-color: var(--contact-error) !important;
+    color: var(--danger) !important;
+    border-color: var(--danger) !important;
     background: transparent;
 }
 
 .btn-outline-danger:hover {
     color: #ffffff !important;
-    background-color: #b91c1c !important;
-    border-color: #b91c1c !important;
+    background-color: var(--danger) !important;
+    border-color: var(--danger) !important;
 }
 
-/* Feedback Message Contrast Overrides */
+/* Small inline loading spinner for buttons mid-request, e.g.
+   <button><span class="spinner-inline"></span> Logging in…</button>
+   Toggle it in/out with JS while an XHR is in flight so the user
+   gets feedback instead of a button that looks unresponsive. */
+.spinner-inline {
+    display: inline-block;
+    width: 0.9em;
+    height: 0.9em;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    vertical-align: -0.15em;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ---------- 9. Feedback text (login/add/search results) ---------- */
 #inner-title {
     color: var(--text-primary);
     letter-spacing: 0.05em;
 }
 
 #white-title {
-    color: white;
+    color: var(--text-secondary);
     letter-spacing: 0.05em;
 }
 
 #loginResult {
     display: inline-block;
-    color: var(--contact-error) !important; /* 6.45:1 contrast */
+    color: var(--danger) !important;
 }
 
 #contactAddResult {
     display: inline-block;
 }
 
-#contactAddResult.text-success, .text-success-wcag {
-    color: var(--contact-success) !important; /* 9.29:1 contrast */
+#contactAddResult.text-success,
+.text-success-wcag {
+    color: var(--success) !important;
 }
 
-#contactAddResult.text-danger, .text-danger-wcag {
-    color: var(--contact-error) !important; /* 6.45:1 contrast */
+#contactAddResult.text-danger,
+.text-danger-wcag {
+    color: var(--danger) !important;
 }
 
-#contactSearchResult, .text-info-wcag {
+#contactSearchResult,
+.text-info-wcag {
     display: inline-block;
-    color: var(--contact-info) !important; /* 6.83:1 contrast */
+    color: var(--info) !important;
 }
 
+/* Generic alert/banner box — use for any status message that
+   isn't tied to one specific #id, e.g. an admin action result:
+   <div class="alert-box alert-success">Password updated</div> */
+.alert-box {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.alert-success { background: var(--success-soft); color: var(--success); border-color: var(--success); }
+.alert-danger  { background: var(--danger-soft);  color: var(--danger);  border-color: var(--danger); }
+.alert-warning { background: var(--warning-soft); color: var(--warning); border-color: var(--warning); }
+.alert-info    { background: var(--info-soft);    color: var(--info);    border-color: var(--info); }
+
+/* ---------- 10. Contact list & chips ---------- */
 #contactList {
     word-break: break-word;
+}
+
+/* Cleaner alternative to the long inline Bootstrap utility class
+   soup currently built in code.js for each contact chip. Swap the
+   badge's class list for just "contact-chip" if you want to tidy
+   up that template string later — purely optional. */
+.contact-chip {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.6rem 0.9rem;
+    background: var(--bg-section);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.contact-chip .btn-close {
+    margin-left: auto;
+}
+
+/* Shown when a search/list comes back empty */
+.empty-state {
+    padding: 1.5rem 1rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* ---------- 11. Tables (for the admin dashboard) ----------
+   Not used yet on index.html/contact.html, but your teammate
+   building the admin view will need a themed table — this keeps
+   it consistent with the rest of the app instead of default
+   Bootstrap table styling. */
+.table {
+    --bs-table-bg: var(--bg-card);
+    --bs-table-color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.table thead th {
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom-width: 1px;
+}
+
+.table tbody tr:hover {
+    background: var(--bg-section);
+}
+
+/* Role / status pills for an admin user table, e.g.
+   <span class="role-pill role-admin">Admin</span>
+   <span class="status-pill status-disabled">Disabled</span> */
+.role-pill,
+.status-pill {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.role-admin    { background: var(--brand-soft); color: var(--brand); }
+.role-user     { background: var(--bg-section); color: var(--text-secondary); }
+.status-active   { background: var(--success-soft); color: var(--success); }
+.status-disabled { background: var(--danger-soft);  color: var(--danger); }
+
+/* ---------- 12. Small responsive tweaks ---------- */
+@media (max-width: 576px) {
+    .glass-card {
+        border-radius: var(--radius-md) !important;
+    }
+
+    .app-icon-wrapper {
+        width: 52px;
+        height: 52px;
+        font-size: 1.6rem;
+    }
 }
