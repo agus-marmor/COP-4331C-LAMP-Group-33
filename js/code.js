@@ -1,8 +1,6 @@
-const urlBase = (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.origin.includes('corinabrockman')))
-  ? '/api/index.php'
-  : 'https://corinabrockman.site/api/index.php';
-
-const loginUrlBase = urlBase;
+const urlBase = '/api/index.php';
+const loginUrlBase = '/api/Login.php';
+const registerUrlBase = '/api/Register.php';
 
 let userId = 0;
 let firstName = "";
