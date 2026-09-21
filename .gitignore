@@ -1,0 +1,48 @@
+## Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## Editors and IDEs
+.idea/
+.vscode/
+frontend/.vscode/
+*.swp
+*.swo
+
+## Environment and secrets
+.env
+.env.*
+!.env.example
+
+## Logs and temporary files
+*.log
+tmp/
+temp/
+
+## Dependencies
+node_modules/
+vendor/
+
+## Build and test output
+dist/
+build/
+coverage/
+
+## PHP and Laravel runtime files
+storage/logs/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+bootstrap/cache/
+
+## Local databases and dumps
+*.sqlite
+*.sqlite3
+*.db
+*.sql.gz
+
+## Archives
+*.zip
+*.tar
+*.gz
