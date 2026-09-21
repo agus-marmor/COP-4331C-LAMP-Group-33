@@ -215,6 +215,22 @@ input:focus-visible,
     border: 1px solid var(--border-color) !important;
 }
 
+.contact-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1rem;
+    background: var(--bg-section);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.contact-name {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
 /* Disabled controls should look obviously inert */
 .form-control:disabled,
 .form-control[readonly] {
