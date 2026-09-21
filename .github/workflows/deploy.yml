@@ -18,10 +18,11 @@ jobs:
           echo "${{ secrets.DROPLET_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.DROPLET_HOST }} >> ~/.ssh/known_hosts
-      - name: Deploy API and Frontend via Rsync
+
+      - name: Deploy Frontend and API via Rsync
         run: |
+          rsync -avz --delete --exclude 'api' --rsync-path="sudo rsync" -e "ssh -i ~/.ssh/id_rsa" frontend/ ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }}:/var/www/html/
           rsync -avz --delete --rsync-path="sudo rsync" -e "ssh -i ~/.ssh/id_rsa" api/ ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }}:/var/www/html/api/
-          rsync -avz --delete --rsync-path="sudo rsync" -e "ssh -i ~/.ssh/id_rsa" frontend/ ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }}:/var/www/html/frontend/
 
       - name: Execute LAMP Post-Deployment Setup
         uses: appleboy/ssh-action@v1.0.3
@@ -30,8 +31,6 @@ jobs:
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
           script: |
-            sudo chown -R www-data:www-data /var/www/html/api
-            sudo chown -R www-data:www-data /var/www/html/frontend
-            
-            sudo find /var/www/html/api /var/www/html/frontend -type d -exec chmod 755 {} \;
-            sudo find /var/www/html/api /var/www/html/frontend -type f -exec chmod 644 {} \;
+            sudo chown -R www-data:www-data /var/www/html
+            sudo find /var/www/html -type d -exec chmod 755 {} \;
+            sudo find /var/www/html -type f -exec chmod 644 {} \;
