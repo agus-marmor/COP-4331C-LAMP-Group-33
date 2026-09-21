@@ -11,6 +11,7 @@ function doLogin() {
   let passwordInput = document.getElementById("loginPassword");
   let login = loginInput ? loginInput.value.trim() : "";
   let password = passwordInput ? passwordInput.value.trim() : "";
+  let contactsCache = {};
 
   document.getElementById("loginResult").innerHTML = "";
   performLogin(login, password);
@@ -253,33 +254,32 @@ function searchContact() {
       if (this.readyState === 4 && this.status === 200) {
         resultSpan.innerHTML = "<i class='bi bi-check-circle me-1'></i> Results updated";
         let jsonObject = JSON.parse(xhr.responseText);
-        let targetP = document.getElementById("contactList") || document.getElementsByTagName("p")[0];
-
+        let targetDiv = document.getElementById("contactList");
         let contacts = jsonObject.contacts || [];
-        if (contacts.length === 0 && Array.isArray(jsonObject.results) && jsonObject.results.length > 0) {
-          contacts = jsonObject.results.map(name => ({ id: null, name: name }));
-        }
+
+        contactsCache = {};
 
         if (contacts.length === 0 || jsonObject.error === "No Records Found") {
-          if (targetP) targetP.innerHTML = `<div class="text-secondary-contrast small italic py-2"><i class="bi bi-info-circle me-1"></i> No matching contacts found.</div>`;
+          if (targetDiv) targetDiv.innerHTML = `<div class="empty-state"><i class="bi bi-info-circle me-1"></i> No matching contacts found.</div>`;
           return;
         }
 
-        let contactList = "";
+        let rows = "";
         for (let i = 0; i < contacts.length; i++) {
           let c = contacts[i];
-          let contactName = typeof c === 'string' ? c : c.name;
-          let contactId = (typeof c === 'object' && c.id) ? c.id : null;
+          let fullName = [c.firstName, c.lastName].filter(Boolean).join(" ") || "Unnamed Contact";
+          contactsCache[c.id] = c;
 
-        contactList += `<div class="badge rounded-pill bg-secondary-bg-subtle text-body border border-secondary px-2 py-2 fs-6 shadow-sm me-2 mb-3 d-flex align-items-center" style="width:100%">
-	  <span class="bi bi-file-person me-2" style="width: 14px; height: 12px; background-contactName: ${contactName};"></span>
-	  <span>${contactName}</span>
-	  <button type="button" class="btn-close btn-close-black ms-auto" style="font-size: 0.65rem;" onclick="deleteContact(${contactId ? contactId : `'${contactName.replace(/'/g, "\\'")}'`});" title="Delete Contact"></button>
-	</div>`;
-	}
+          rows += `<div class="contact-row" data-id="${c.id}">
+            <span class="contact-name">${fullName}</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="openEditContact(${c.id});" title="Edit Contact">
+              <i class="bi bi-pencil"></i>
+            </button>
+          </div>`;
+        }
 
-        if (targetP) {
-          targetP.innerHTML = contactList;
+        if (targetDiv) {
+          targetDiv.innerHTML = rows;
         }
       }
     };
@@ -287,6 +287,87 @@ function searchContact() {
   } catch (err) {
     resultSpan.innerHTML = err.message;
   }
+}
+
+function openEditContact(id) {
+  let c = contactsCache[id];
+  if (!c) return;
+
+  document.getElementById("editContactId").value = c.id;
+  document.getElementById("editFirstName").value = c.firstName || "";
+  document.getElementById("editLastName").value = c.lastName || "";
+  document.getElementById("editEmail").value = c.email || "";
+  document.getElementById("editPhone").value = c.phone || "";
+  document.getElementById("editContactResult").innerHTML = "";
+
+  let modalEl = document.getElementById("editContactModal");
+  let modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+  modal.show();
+}
+
+function saveContactEdit() {
+  let id = document.getElementById("editContactId").value;
+  let firstName = document.getElementById("editFirstName").value.trim();
+  let lastName = document.getElementById("editLastName").value.trim();
+  let email = document.getElementById("editEmail").value.trim();
+  let phone = document.getElementById("editPhone").value.trim();
+  let resultEl = document.getElementById("editContactResult");
+  resultEl.innerHTML = "";
+
+  if (!firstName || !lastName || !email) {
+    resultEl.className = "text-warning small fw-semibold";
+    resultEl.innerHTML = "<i class='bi bi-exclamation-triangle-fill me-1'></i> First name, last name, and email are required";
+    return;
+  }
+
+  let jsonPayload = JSON.stringify({ id, firstName, lastName, email, phone });
+
+  let xhr = new XMLHttpRequest();
+  xhr.open("PUT", urlBase, true);
+  xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+  xhr.setRequestHeader("Authorization", "Bearer " + userId);
+  xhr.setRequestHeader("X-User-Id", userId);
+
+  try {
+    xhr.onreadystatechange = function () {
+      if (this.readyState === 4) {
+        if (this.status === 200) {
+          let modalEl = document.getElementById("editContactModal");
+          let modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+          modal.hide();
+          searchContact();
+        } else {
+          try {
+            let res = JSON.parse(xhr.responseText);
+            resultEl.className = "text-danger-wcag small fw-semibold";
+            resultEl.innerHTML = res.error || "Failed to update contact";
+          } catch (e) {
+            resultEl.className = "text-danger-wcag small fw-semibold";
+            resultEl.innerHTML = "Error updating contact";
+          }
+        }
+      }
+    };
+    xhr.send(jsonPayload);
+  } catch (err) {
+    resultEl.className = "text-danger-wcag small fw-semibold";
+    resultEl.innerHTML = err.message;
+  }
+}
+
+function deleteContactFromModal() {
+  let id = document.getElementById("editContactId").value;
+  if (!id) return;
+
+  if (!confirm("Are you sure you want to delete this contact? This cannot be undone.")) {
+    return;
+  }
+
+  let modalEl = document.getElementById("editContactModal");
+  let modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+  modal.hide();
+
+  deleteContact(parseInt(id));
 }
 
 function deleteContact(identifier) {
