@@ -7,22 +7,24 @@ let firstName = "";
 let lastName = "";
 
 function doLogin() {
-  userId = 0;
-  firstName = "";
-  lastName = "";
-
   let loginInput = document.getElementById("loginName");
   let passwordInput = document.getElementById("loginPassword");
   let login = loginInput ? loginInput.value.trim() : "";
   let password = passwordInput ? passwordInput.value.trim() : "";
 
   document.getElementById("loginResult").innerHTML = "";
+  performLogin(login, password);
+}
+
+function performLogin(login, password) {
+  userId = 0;
+  firstName = "";
+  lastName = "";
 
   let jsonPayload = JSON.stringify({ login: login, password: password });
-  let url = loginUrlBase;
 
   let xhr = new XMLHttpRequest();
-  xhr.open("POST", url, true);
+  xhr.open("POST", loginUrlBase, true);
   xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
   try {
     xhr.onreadystatechange = function () {
@@ -51,6 +53,67 @@ function doLogin() {
     xhr.send(jsonPayload);
   } catch (err) {
     document.getElementById("loginResult").innerHTML = err.message;
+  }
+}
+
+function doRegister() {
+  let firstNameInput = document.getElementById("registerFirstName");
+  let lastNameInput = document.getElementById("registerLastName");
+  let loginInput = document.getElementById("registerLogin");
+  let passwordInput = document.getElementById("registerPassword");
+  let resultEl = document.getElementById("registerResult");
+  resultEl.innerHTML = "";
+
+  let firstNameVal = firstNameInput.value.trim();
+  let lastNameVal = lastNameInput.value.trim();
+  let loginVal = loginInput.value.trim();
+  let passwordVal = passwordInput.value;
+
+  if (!firstNameVal || !lastNameVal || !loginVal || !passwordVal) {
+    resultEl.className = "text-warning small fw-semibold";
+    resultEl.innerHTML = "<i class='bi bi-exclamation-triangle-fill me-1'></i> All fields are required";
+    return;
+  }
+
+  let jsonPayload = JSON.stringify({
+    firstName: firstNameVal,
+    lastName: lastNameVal,
+    login: loginVal,
+    password: passwordVal
+  });
+
+  let xhr = new XMLHttpRequest();
+  xhr.open("POST", registerUrlBase, true);
+  xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+
+  try {
+    xhr.onreadystatechange = function () {
+      if (this.readyState === 4) {
+        if (this.status === 201 || this.status === 200) {
+          resultEl.className = "text-success-wcag small fw-semibold";
+          resultEl.innerHTML = "<i class='bi bi-check-circle-fill me-1'></i> Account created! Logging you in...";
+
+          let modalEl = document.getElementById("registerModal");
+          let modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+          modal.hide();
+
+          performLogin(loginVal, passwordVal);
+        } else {
+          try {
+            let res = JSON.parse(xhr.responseText);
+            resultEl.className = "text-danger-wcag small fw-semibold";
+            resultEl.innerHTML = res.error || "Registration failed";
+          } catch (e) {
+            resultEl.className = "text-danger-wcag small fw-semibold";
+            resultEl.innerHTML = "Registration failed";
+          }
+        }
+      }
+    };
+    xhr.send(jsonPayload);
+  } catch (err) {
+    resultEl.className = "text-danger-wcag small fw-semibold";
+    resultEl.innerHTML = err.message;
   }
 }
 
