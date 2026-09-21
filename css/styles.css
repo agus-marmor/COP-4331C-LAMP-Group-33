@@ -312,9 +312,9 @@ input:focus-visible,
     letter-spacing: 0.05em;
 }
 
-#white-title {
+#secondary-inner-title {
     color: var(--text-secondary);
-    letter-spacing: 0.05em;
+    letter-spacing: 0.02em;
 }
 
 #loginResult {
