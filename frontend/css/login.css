@@ -71,7 +71,8 @@
      width: min(440px, calc(100% - 2rem));
      margin: 0 auto;
      padding: clamp(2.5rem, 8vh, 4.5rem) 0;
-     animation: rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+     /* Use forwards (not both) so a lingering transform doesn't break nested fixed UI */
+     animation: rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
  }
 
  .login-brand {
@@ -266,7 +267,7 @@
 
      to {
          opacity: 1;
-         transform: translateY(0);
+         transform: none;
      }
  }
 
