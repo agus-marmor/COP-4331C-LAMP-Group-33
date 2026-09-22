@@ -258,3 +258,50 @@
      letter-spacing: -0.02em;
  }
 
+ @keyframes rise-in {
+     from {
+         opacity: 0;
+         transform: translateY(18px);
+     }
+
+     to {
+         opacity: 1;
+         transform: translateY(0);
+     }
+ }
+
+ @keyframes mark-pop {
+     from {
+         opacity: 0;
+         transform: scale(0.82);
+     }
+
+     to {
+         opacity: 1;
+         transform: scale(1);
+     }
+ }
+
+ @keyframes drift {
+
+     0%,
+     100% {
+         transform: translate(0, 0);
+     }
+
+     50% {
+         transform: translate(-18px, 14px);
+     }
+ }
+
+ @media (prefers-reduced-motion: reduce) {
+
+     .login-atmosphere::before,
+     .login-atmosphere::after,
+     main.login-shell,
+     .login-mark,
+     .login-tagline,
+     #loginDiv.login-panel {
+         animation: none !important;
+     }
+ }
