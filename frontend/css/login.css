@@ -93,3 +93,168 @@
      animation: mark-pop 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
  }
 
+ #title {
+     font-family: var(--login-font-display);
+     font-weight: 800;
+     font-size: clamp(1.85rem, 5vw, 2.35rem);
+     letter-spacing: -0.04em;
+     line-height: 1.1;
+     color: var(--login-ink) !important;
+     margin: 0 0 0.45rem;
+ }
+
+ .login-tagline {
+     margin: 0;
+     color: var(--login-muted);
+     font-size: 0.98rem;
+     font-weight: 500;
+     animation: rise-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+ }
+
+ #loginDiv.login-panel {
+     background: var(--login-surface) !important;
+     border: 1px solid var(--login-border) !important;
+     border-radius: 1.35rem !important;
+     backdrop-filter: blur(18px);
+     -webkit-backdrop-filter: blur(18px);
+     box-shadow:
+         0 1px 0 rgba(255, 255, 255, 0.7) inset,
+         0 24px 48px -20px rgba(20, 32, 26, 0.22) !important;
+     padding: clamp(1.5rem, 4vw, 2rem) !important;
+     animation: rise-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
+ }
+
+ #inner-title {
+     font-family: var(--login-font-display);
+     font-size: 1.15rem !important;
+     font-weight: 700 !important;
+     letter-spacing: -0.02em !important;
+     text-transform: none !important;
+     color: var(--login-ink);
+     margin-bottom: 1.35rem !important;
+ }
+
+ .login-page .form-label-contrast {
+     color: var(--login-muted) !important;
+     font-weight: 600;
+     font-size: 0.8rem;
+     letter-spacing: 0.04em;
+     text-transform: uppercase;
+ }
+
+ .login-field {
+     margin-bottom: 1.65rem;
+ }
+
+ .login-field-password {
+     margin-bottom: 1.75rem;
+ }
+
+ .login-page .form-control,
+ .login-page .input-group-text {
+     border-radius: 0.75rem !important;
+     border-color: rgba(20, 32, 26, 0.12) !important;
+     background: rgba(255, 255, 255, 0.92) !important;
+ }
+
+ .login-page .input-group-text {
+     border-right: 0 !important;
+     padding-left: 1rem;
+ }
+
+ .login-page .input-group .form-control {
+     border-left: 0 !important;
+     padding-left: 0.35rem;
+ }
+
+ .login-page .input-group:focus-within .form-control,
+ .login-page .input-group:focus-within .input-group-text {
+     border-color: var(--login-brand) !important;
+ }
+
+ .login-page .form-control:focus {
+     box-shadow: none !important;
+ }
+
+ .login-page .btn-primary {
+     background: linear-gradient(145deg, var(--login-brand), var(--login-brand-deep)) !important;
+     border: none;
+     border-radius: 0.85rem !important;
+     padding-block: 0.9rem !important;
+     font-family: var(--login-font-display);
+     font-weight: 700;
+     letter-spacing: -0.01em;
+     box-shadow: 0 10px 24px rgba(10, 92, 56, 0.3);
+ }
+
+ .login-page .btn-primary:hover {
+     transform: translateY(-2px);
+     box-shadow: 0 14px 28px rgba(10, 92, 56, 0.38);
+ }
+
+ .login-page .btn-primary:active {
+     transform: translateY(0);
+ }
+
+ .login-footer {
+     display: flex;
+     flex-wrap: wrap;
+     align-items: center;
+     justify-content: center;
+     gap: 0.5rem 0.75rem;
+     margin-top: 1.35rem;
+     padding-top: 1.15rem;
+     border-top: 1px solid rgba(20, 32, 26, 0.08);
+ }
+
+ #secondary-inner-title {
+     color: var(--login-muted);
+     font-size: 0.92rem;
+     letter-spacing: 0;
+ }
+
+ .login-page .btn-signup {
+     color: var(--login-brand) !important;
+     border: 1.5px solid rgba(10, 92, 56, 0.35) !important;
+     background: transparent;
+     border-radius: 999px !important;
+     padding: 0.35rem 0.9rem !important;
+     font-size: 0.88rem;
+     font-weight: 700;
+     width: auto !important;
+ }
+
+ .login-page .btn-signup:hover {
+     background: var(--login-brand) !important;
+     color: #fff !important;
+     border-color: var(--login-brand) !important;
+ }
+
+ #loginResult:not(:empty) {
+     display: inline-flex;
+     align-items: center;
+     gap: 0.35rem;
+     margin-top: 0.25rem;
+     padding: 0.55rem 0.85rem;
+     border-radius: 0.65rem;
+     background: #fbeae9;
+     color: #b3261e !important;
+ }
+
+ .login-page .modal-content.glass-card {
+     background: rgba(255, 255, 255, 0.94) !important;
+     border: 1px solid var(--login-border) !important;
+     border-radius: 1.25rem !important;
+     backdrop-filter: blur(16px);
+ }
+
+ .login-page .modal-header {
+     border-bottom-color: rgba(20, 32, 26, 0.08);
+ }
+
+ .login-page .modal-title {
+     font-family: var(--login-font-display);
+     font-weight: 700;
+     letter-spacing: -0.02em;
+ }
+
