@@ -5,13 +5,24 @@ const registerUrlBase = '/api/Register.php';
 let userId = 0;
 let firstName = "";
 let lastName = "";
+let contactsCache = {};
+
+// Escape text before putting it into innerHTML, so a contact named
+// "<img src=x onerror=alert(1)>" shows up as text instead of running code.
+function escapeHtml(str) {
+  return String(str == null ? "" : str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 function doLogin() {
   let loginInput = document.getElementById("loginName");
   let passwordInput = document.getElementById("loginPassword");
   let login = loginInput ? loginInput.value.trim() : "";
   let password = passwordInput ? passwordInput.value.trim() : "";
-  let contactsCache = {};
 
   document.getElementById("loginResult").innerHTML = "";
   performLogin(login, password);
@@ -158,7 +169,7 @@ function readCookie() {
   } else {
     let userNameEl = document.getElementById("userName");
     if (userNameEl) {
-      userNameEl.innerHTML = `<i class="bi bi-person-circle me-1 text-primary"></i> <span>Logged in as <strong class="--text-secondary">${firstName} ${lastName}</strong></span>`;
+      userNameEl.innerHTML = `<i class="bi bi-person-circle me-1"></i> Logged in as <strong>${escapeHtml(firstName)} ${escapeHtml(lastName)}</strong>`;
     }
     searchContact();
   }
@@ -252,7 +263,6 @@ function searchContact() {
   try {
     xhr.onreadystatechange = function () {
       if (this.readyState === 4 && this.status === 200) {
-        resultSpan.innerHTML = "<i class='bi bi-check-circle me-1'></i> Results updated";
         let jsonObject = JSON.parse(xhr.responseText);
         let targetDiv = document.getElementById("contactList");
         let contacts = jsonObject.contacts || [];
@@ -260,19 +270,35 @@ function searchContact() {
         contactsCache = {};
 
         if (contacts.length === 0 || jsonObject.error === "No Records Found") {
-          if (targetDiv) targetDiv.innerHTML = `<div class="empty-state"><i class="bi bi-info-circle me-1"></i> No matching contacts found.</div>`;
+          resultSpan.innerHTML = "";
+          let msg = srch
+            ? `No contacts match "${escapeHtml(srch)}".`
+            : "No contacts yet. Click <strong>Add contact</strong> to create your first one.";
+          if (targetDiv) targetDiv.innerHTML = `<div class="empty-state"><i class="bi bi-people"></i>${msg}</div>`;
           return;
         }
+
+        resultSpan.innerHTML = contacts.length + (contacts.length === 1 ? " contact" : " contacts");
 
         let rows = "";
         for (let i = 0; i < contacts.length; i++) {
           let c = contacts[i];
           let fullName = [c.firstName, c.lastName].filter(Boolean).join(" ") || "Unnamed Contact";
-          contactsCache[c.id] = c;
+          let initials = ((c.firstName || "").charAt(0) + (c.lastName || "").charAt(0)).toUpperCase() || "?";
+          let id = parseInt(c.id);
+          contactsCache[id] = c;
 
-          rows += `<div class="contact-row" data-id="${c.id}">
-            <span class="contact-name">${fullName}</span>
-            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="openEditContact(${c.id});" title="Edit Contact">
+          let meta = "";
+          if (c.email) meta += `<span><i class="bi bi-envelope"></i>${escapeHtml(c.email)}</span>`;
+          if (c.phone) meta += `<span><i class="bi bi-telephone"></i>${escapeHtml(c.phone)}</span>`;
+
+          rows += `<div class="contact-row" data-id="${id}">
+            <div class="contact-avatar" aria-hidden="true">${escapeHtml(initials)}</div>
+            <div class="contact-info">
+              <span class="contact-name">${escapeHtml(fullName)}</span>
+              ${meta ? `<div class="contact-meta">${meta}</div>` : ""}
+            </div>
+            <button type="button" class="btn btn-edit" onclick="openEditContact(${id});" title="Edit ${escapeHtml(fullName)}" aria-label="Edit ${escapeHtml(fullName)}">
               <i class="bi bi-pencil"></i>
             </button>
           </div>`;
