@@ -1,0 +1,499 @@
+/* ============================================================
+   Contacts page — matches the look of login.css
+   (same fonts, green palette, glass panel, drifting background)
+   Loaded AFTER styles.css so these rules win.
+   ============================================================ */
+
+:root {
+    --ct-ink: #14201a;
+    --ct-muted: #5a6b62;
+    --ct-brand: #0a5c38;
+    --ct-brand-deep: #064028;
+    --ct-brand-soft: rgba(10, 92, 56, 0.1);
+    --ct-surface: rgba(255, 255, 255, 0.78);
+    --ct-row: rgba(255, 255, 255, 0.72);
+    --ct-border: rgba(20, 32, 26, 0.1);
+    --ct-font-display: "Outfit", sans-serif;
+    --ct-font-body: "Manrope", sans-serif;
+    --ct-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------- Page background (same as login) ---------- */
+body.contacts-page {
+    font-family: var(--ct-font-body);
+    color: var(--ct-ink);
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden;
+    background:
+        radial-gradient(ellipse 80% 60% at 10% 20%, rgba(10, 92, 56, 0.18), transparent 55%),
+        radial-gradient(ellipse 70% 50% at 90% 80%, rgba(45, 120, 90, 0.14), transparent 50%),
+        linear-gradient(160deg, #e8f0eb 0%, #f4f7f5 42%, #dfe9e3 100%);
+}
+
+.contacts-atmosphere {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.contacts-atmosphere::before,
+.contacts-atmosphere::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    animation: ct-drift 18s ease-in-out infinite;
+}
+
+.contacts-atmosphere::before {
+    width: min(55vw, 420px);
+    height: min(55vw, 420px);
+    top: -8%;
+    right: -6%;
+    background: rgba(10, 92, 56, 0.22);
+}
+
+.contacts-atmosphere::after {
+    width: min(45vw, 340px);
+    height: min(45vw, 340px);
+    bottom: -10%;
+    left: -4%;
+    background: rgba(90, 140, 110, 0.2);
+    animation-delay: -7s;
+}
+
+.contacts-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(20, 32, 26, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 32, 26, 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 20%, transparent 75%);
+}
+
+/* ---------- Layout ---------- */
+main.contacts-shell {
+    position: relative;
+    z-index: 1;
+    width: min(760px, calc(100% - 2rem));
+    margin: 0 auto;
+    padding: clamp(2rem, 7vh, 4rem) 0;
+    animation: ct-rise-in 0.7s var(--ct-ease) both;
+}
+
+/* ---------- Header ---------- */
+.contacts-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.contacts-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+}
+
+.contacts-mark {
+    width: 3rem;
+    height: 3rem;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 0.9rem;
+    background: linear-gradient(145deg, var(--ct-brand), var(--ct-brand-deep));
+    color: #fff;
+    font-size: 1.35rem;
+    box-shadow: 0 12px 28px rgba(10, 92, 56, 0.28);
+    animation: ct-mark-pop 0.8s var(--ct-ease) 0.1s both;
+}
+
+.contacts-page #title {
+    font-family: var(--ct-font-display);
+    font-weight: 800;
+    font-size: clamp(1.6rem, 4.5vw, 2rem);
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    color: var(--ct-ink) !important;
+    margin: 0;
+}
+
+.contacts-tagline {
+    margin: 0.15rem 0 0;
+    color: var(--ct-muted);
+    font-size: 0.92rem;
+    font-weight: 500;
+}
+
+/* "Logged in as ..." pill + logout */
+.user-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.35rem 0.4rem 0.35rem 1rem;
+    background: var(--ct-surface);
+    border: 1px solid var(--ct-border);
+    border-radius: 999px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 10px 24px -16px rgba(20, 32, 26, 0.3);
+}
+
+#userName {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--ct-muted);
+}
+
+#userName strong {
+    color: var(--ct-ink);
+    font-weight: 700;
+}
+
+#userName .bi {
+    color: var(--ct-brand);
+}
+
+.contacts-page .btn-logout {
+    color: #b3261e !important;
+    border: 1.5px solid rgba(179, 38, 30, 0.3) !important;
+    background: transparent !important;
+    border-radius: 999px !important;
+    padding: 0.3rem 0.85rem !important;
+    font-size: 0.84rem;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.contacts-page .btn-logout:hover {
+    background: #b3261e !important;
+    border-color: #b3261e !important;
+    color: #fff !important;
+}
+
+/* ---------- Main glass panel ---------- */
+#accessUIDiv.contacts-panel {
+    background: var(--ct-surface) !important;
+    border: 1px solid var(--ct-border) !important;
+    border-radius: 1.35rem !important;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.7) inset,
+        0 24px 48px -20px rgba(20, 32, 26, 0.22) !important;
+    padding: clamp(1.25rem, 4vw, 2rem) !important;
+    animation: ct-rise-in 0.8s var(--ct-ease) 0.18s both;
+}
+
+.panel-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.1rem;
+}
+
+.panel-title {
+    font-family: var(--ct-font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ct-ink);
+    margin: 0;
+}
+
+/* Result count ("3 contacts") next to the heading */
+#contactSearchResult {
+    color: var(--ct-muted) !important;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Search bar + add button row */
+.toolbar {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.toolbar .input-group {
+    flex: 1;
+}
+
+/* ---------- Form fields (same treatment as login) ---------- */
+.contacts-page .form-label-contrast {
+    color: var(--ct-muted) !important;
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.contacts-page .form-control,
+.contacts-page .input-group-text {
+    border-color: rgba(20, 32, 26, 0.12) !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    font-family: var(--ct-font-body);
+}
+
+.contacts-page .form-control {
+    border-radius: 0.75rem !important;
+}
+
+.contacts-page .input-group > .input-group-text {
+    border-right: 0 !important;
+    border-radius: 0.75rem 0 0 0.75rem !important;
+    padding-left: 1rem;
+    color: var(--ct-muted) !important;
+}
+
+.contacts-page .input-group > .form-control {
+    border-left: 0 !important;
+    border-radius: 0 0.75rem 0.75rem 0 !important;
+    padding-left: 0.35rem;
+}
+
+.contacts-page .input-group:focus-within > .form-control,
+.contacts-page .input-group:focus-within > .input-group-text,
+.contacts-page .form-control:focus {
+    border-color: var(--ct-brand) !important;
+}
+
+.contacts-page .form-control:focus {
+    box-shadow: none !important;
+}
+
+/* ---------- Buttons ---------- */
+.contacts-page .btn-primary {
+    background: linear-gradient(145deg, var(--ct-brand), var(--ct-brand-deep)) !important;
+    border: none;
+    border-radius: 0.85rem !important;
+    font-family: var(--ct-font-display);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    box-shadow: 0 10px 24px rgba(10, 92, 56, 0.3);
+}
+
+.contacts-page .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(10, 92, 56, 0.38);
+}
+
+.contacts-page .btn-primary:active {
+    transform: translateY(0);
+}
+
+.toolbar .btn-primary {
+    padding-inline: 1.15rem;
+    white-space: nowrap;
+}
+
+.contacts-page .modal .btn-primary,
+.contacts-page .modal .btn-outline-danger {
+    padding-block: 0.8rem !important;
+}
+
+.contacts-page .modal .btn-outline-danger {
+    border-radius: 0.85rem !important;
+    border-width: 1.5px;
+    font-family: var(--ct-font-display);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+/* ---------- Contact rows ---------- */
+#contactList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.contacts-page .contact-row {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.75rem 0.75rem 0.75rem 0.85rem;
+    background: var(--ct-row);
+    border: 1px solid var(--ct-border);
+    border-radius: 1rem;
+    transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+    /* "backwards" (not "both") so the hover lift below still works after the animation ends */
+    animation: ct-rise-in 0.5s var(--ct-ease) backwards;
+}
+
+.contacts-page .contact-row:hover {
+    transform: translateY(-1px);
+    border-color: rgba(10, 92, 56, 0.25);
+    box-shadow: 0 12px 24px -16px rgba(20, 32, 26, 0.35);
+}
+
+/* Stagger the first few rows so the list "deals in" */
+.contact-row:nth-child(2) { animation-delay: 0.04s; }
+.contact-row:nth-child(3) { animation-delay: 0.08s; }
+.contact-row:nth-child(4) { animation-delay: 0.12s; }
+.contact-row:nth-child(5) { animation-delay: 0.16s; }
+.contact-row:nth-child(n + 6) { animation-delay: 0.2s; }
+
+.contact-avatar {
+    width: 2.6rem;
+    height: 2.6rem;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 0.8rem;
+    background: var(--ct-brand-soft);
+    color: var(--ct-brand);
+    font-family: var(--ct-font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+}
+
+.contact-info {
+    flex: 1;
+    min-width: 0; /* lets long emails truncate instead of overflowing */
+}
+
+.contacts-page .contact-name {
+    display: block;
+    font-family: var(--ct-font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--ct-ink);
+    line-height: 1.25;
+}
+
+.contact-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.1rem 1rem;
+    margin-top: 0.15rem;
+    font-size: 0.83rem;
+    color: var(--ct-muted);
+}
+
+.contact-meta span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+.contact-meta .bi {
+    margin-right: 0.3rem;
+    color: var(--ct-brand);
+    opacity: 0.7;
+}
+
+.btn-edit {
+    width: 2.25rem;
+    height: 2.25rem;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border-radius: 0.7rem;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--ct-muted);
+}
+
+.btn-edit:hover {
+    background: var(--ct-brand-soft);
+    border-color: rgba(10, 92, 56, 0.2);
+    color: var(--ct-brand);
+}
+
+/* Empty / no results */
+.contacts-page .empty-state {
+    padding: 2.25rem 1rem;
+    text-align: center;
+    color: var(--ct-muted);
+    border: 1.5px dashed rgba(20, 32, 26, 0.14);
+    border-radius: 1rem;
+    font-size: 0.92rem;
+}
+
+.contacts-page .empty-state .bi {
+    display: block;
+    font-size: 1.6rem;
+    margin-bottom: 0.4rem;
+    color: var(--ct-brand);
+    opacity: 0.6;
+}
+
+/* ---------- Modals (same as login's register modal) ---------- */
+.contacts-page .modal-content.glass-card {
+    background: rgba(255, 255, 255, 0.94) !important;
+    border: 1px solid var(--ct-border) !important;
+    border-radius: 1.25rem !important;
+    backdrop-filter: blur(16px);
+}
+
+.contacts-page .modal-header {
+    border-bottom-color: rgba(20, 32, 26, 0.08);
+}
+
+.contacts-page .modal-title {
+    font-family: var(--ct-font-display);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* Error/success message spans inside modals */
+#contactAddResult:not(:empty),
+#editContactResult:not(:empty) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.55rem 0.85rem;
+    border-radius: 0.65rem;
+    background: #fbeae9;
+}
+
+/* ---------- Small screens ---------- */
+@media (max-width: 576px) {
+    .toolbar {
+        flex-direction: column;
+    }
+
+    .user-pill {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+/* ---------- Animations ---------- */
+@keyframes ct-rise-in {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: none; }
+}
+
+@keyframes ct-mark-pop {
+    from { opacity: 0; transform: scale(0.82); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes ct-drift {
+    0%, 100% { transform: translate(0, 0); }
+    50%      { transform: translate(-18px, 14px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .contacts-atmosphere::before,
+    .contacts-atmosphere::after,
+    main.contacts-shell,
+    .contacts-mark,
+    #accessUIDiv.contacts-panel,
+    .contacts-page .contact-row {
+        animation: none !important;
+    }
+}
