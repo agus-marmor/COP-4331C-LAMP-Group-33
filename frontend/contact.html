@@ -20,6 +20,24 @@
         document.addEventListener('DOMContentLoaded', function () {
             readCookie();
 
+            // Put your name and initials on the account menu button.
+            // (readCookie() has already filled in firstName and lastName.)
+            document.getElementById('accountName').textContent = firstName + ' ' + lastName;
+            // On phones only the initials show, so give screen readers the full label
+            document.getElementById('accountMenuButton').setAttribute('aria-label',
+                'Account menu for ' + firstName + ' ' + lastName);
+            document.getElementById('accountInitials').textContent =
+                (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+
+            // Every time the Change Password popup opens, clear it out.
+            // Passwords should never still be sitting in the boxes from last time.
+            document.getElementById('changePasswordModal').addEventListener('show.bs.modal', function () {
+                document.getElementById('changePasswordForm').reset();
+                let resultEl = document.getElementById('changePasswordResult');
+                resultEl.innerHTML = '';
+                resultEl.className = 'small fw-semibold';
+            });
+
             // Every time the Add Contact popup opens, start fresh:
             // empty boxes and no leftover message from last time.
             document.getElementById('addContactModal').addEventListener('show.bs.modal', function () {
@@ -49,11 +67,30 @@
                 </div>
             </div>
 
-            <div id="loggedInDiv" class="user-pill">
-                <span id="userName"></span>
-                <button type="button" id="logoutButton" class="buttons btn btn-logout btn-sm" onclick="doLogout();">
-                    <i class="bi bi-box-arrow-right me-1"></i>Log out
+            <!-- Account menu: click your name to open a small dropdown.
+                 Bootstrap does the opening/closing because of data-bs-toggle="dropdown". -->
+            <div id="loggedInDiv" class="dropdown account-menu">
+                <button type="button" id="accountMenuButton" class="user-pill dropdown-toggle"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <span id="accountInitials" class="account-avatar" aria-hidden="true"></span>
+                    <span id="accountName"></span>
                 </button>
+
+                <!-- dropdown-menu-end lines the menu up with the right edge of the button -->
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountMenuButton">
+                    <li>
+                        <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                            data-bs-target="#changePasswordModal">
+                            <i class="bi bi-key"></i> Change password
+                        </button>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <button type="button" id="logoutButton" class="dropdown-item item-logout" onclick="doLogout();">
+                            <i class="bi bi-box-arrow-right"></i> Log out
+                        </button>
+                    </li>
+                </ul>
             </div>
         </header>
 
@@ -172,6 +209,44 @@
                         <button type="button" class="buttons btn btn-outline-danger w-100" onclick="deleteContactFromModal();">
                             <i class="bi bi-trash3 me-1"></i> Delete Contact
                         </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-card">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- autocomplete="current-password" / "new-password" tell password managers
+                         which box is which, so they can fill in or save the right one. -->
+                    <form id="changePasswordForm" onsubmit="event.preventDefault(); changePassword();">
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label form-label-contrast">Current Password</label>
+                            <input type="password" id="currentPassword" class="form-control"
+                                autocomplete="current-password" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label form-label-contrast">New Password</label>
+                            <input type="password" id="newPassword" class="form-control"
+                                autocomplete="new-password" minlength="6" required aria-describedby="newPasswordHint" />
+                            <div id="newPasswordHint" class="form-hint">At least 6 characters</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label form-label-contrast">Confirm New Password</label>
+                            <input type="password" id="confirmPassword" class="form-control"
+                                autocomplete="new-password" minlength="6" required />
+                        </div>
+                        <div class="mb-3">
+                            <span id="changePasswordResult" class="small fw-semibold" aria-live="polite"></span>
+                        </div>
+                        <button type="submit" id="changePasswordButton" class="buttons btn btn-primary w-100">Update Password</button>
                     </form>
                 </div>
             </div>

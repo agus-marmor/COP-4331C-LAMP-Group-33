@@ -1,6 +1,7 @@
 const urlBase = '/api/index.php';
 const loginUrlBase = '/api/Login.php';
 const registerUrlBase = '/api/Register.php';
+const userUrlBase = '/api/User.php';
 
 let userId = 0;
 let firstName = "";
@@ -454,4 +455,73 @@ function deleteContact(identifier) {
   } catch (err) {
     console.error(err);
   }
+}
+
+// ---------- Change password ----------
+// Called when the Change Password form is submitted.
+// Sends the current and new password to api/User.php, which checks the
+// current one is right before saving the new one.
+function changePassword() {
+  let currentPassword = document.getElementById("currentPassword").value;
+  let newPassword = document.getElementById("newPassword").value;
+  let confirmPassword = document.getElementById("confirmPassword").value;
+  let resultEl = document.getElementById("changePasswordResult");
+  let submitButton = document.getElementById("changePasswordButton");
+
+  // Small helper so each message below is one line
+  function showMessage(type, text) {
+    resultEl.className = type + " small fw-semibold";
+    resultEl.innerHTML = text;
+  }
+
+  // Checks we can do in the browser before bothering the server
+  if (newPassword.length < 6) {
+    showMessage("text-warning", "<i class='bi bi-exclamation-triangle-fill'></i> New password must be at least 6 characters");
+    return;
+  }
+  if (newPassword !== confirmPassword) {
+    showMessage("text-warning", "<i class='bi bi-exclamation-triangle-fill'></i> New passwords don't match");
+    return;
+  }
+  if (newPassword === currentPassword) {
+    showMessage("text-warning", "<i class='bi bi-exclamation-triangle-fill'></i> New password must be different from your current one");
+    return;
+  }
+
+  let jsonPayload = JSON.stringify({ currentPassword: currentPassword, newPassword: newPassword });
+
+  let xhr = new XMLHttpRequest();
+  xhr.open("PUT", userUrlBase, true);
+  xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+  xhr.setRequestHeader("X-User-Id", userId);
+
+  // Disable the button while waiting, so it can't be clicked twice
+  submitButton.disabled = true;
+
+  xhr.onreadystatechange = function () {
+    if (this.readyState !== 4) return;
+    submitButton.disabled = false;
+
+    if (this.status === 200) {
+      document.getElementById("changePasswordForm").reset();
+      showMessage("text-success-wcag", "<i class='bi bi-check-circle-fill'></i> Password updated!");
+
+      // Close the popup after a moment so there's time to read the message
+      setTimeout(function () {
+        let modalEl = document.getElementById("changePasswordModal");
+        let modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+      }, 1500);
+    } else {
+      // The API sends back a message like "Incorrect current password"
+      let message = "Could not update password";
+      try {
+        let res = JSON.parse(xhr.responseText);
+        if (res.error) message = res.error;
+      } catch (e) { /* response wasn't JSON; keep the default message */ }
+      showMessage("text-danger-wcag", "<i class='bi bi-x-circle-fill'></i> " + escapeHtml(message));
+    }
+  };
+
+  xhr.send(jsonPayload);
 }
