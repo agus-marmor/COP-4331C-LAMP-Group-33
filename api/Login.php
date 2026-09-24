@@ -13,7 +13,7 @@ if(!isset($inDataL["login"], $inDataL["password"])){
     exit();
 }
 
-//connecting to mysql
+//connecting to droplet local mysql
 $conn = new mysqli("localhost", "ContactsAppUser", "COP4331C!", "lamp_db");
 
 // error check
@@ -44,8 +44,13 @@ if($row && password_verify($inDataL["password"], $row["Password"])){
         "error" => ""
     ]);
 } else{
-    http_response_code(401);
-    echo json_encode(["error" => "Invalid username or password"]);
+    http_response_code(200);
+    echo json_encode([
+        "id" => 0,
+        "firstName" => "",
+        "lastName" => "",
+        "error" => "Invalid username or password"
+    ]);
 }
 
 $stmt->close();

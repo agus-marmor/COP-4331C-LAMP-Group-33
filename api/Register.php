@@ -28,11 +28,11 @@ if($connection->connect_error){
 
 // not sure if necessary, wanted more security
 $hashedPassword = password_hash($inData["password"], PASSWORD_DEFAULT);
-
+$role = isset($inData["role"]) && !empty($inData["role"]) ? $inData["role"] : "user";
 //prepare sql template
-$stmt = $connection->prepare("INSERT INTO Users (FirstName, LastName, Login, Password) VALUES  (?, ?, ?, ?)");
+$stmt = $connection->prepare("INSERT INTO Users (FirstName, LastName, Login, Password, role) VALUES  (?, ?, ?, ?, ?)");
 
-$stmt->bind_param("ssss", $inData["firstName"], $inData["lastName"], $inData["login"], $hashedPassword);
+$stmt->bind_param("sssss", $inData["firstName"], $inData["lastName"], $inData["login"], $hashedPassword, $role);
 
 //status codes (modern php was giving me 500 exception instead of 409 so I had to use try catch)
 
