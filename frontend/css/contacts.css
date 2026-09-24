@@ -195,7 +195,7 @@ main.contacts-shell {
 
 .panel-heading {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     gap: 1rem;
     margin-bottom: 1.1rem;
@@ -212,20 +212,16 @@ main.contacts-shell {
 
 /* Result count ("3 contacts") next to the heading */
 #contactSearchResult {
+    display: block;
+    margin-top: 0.1rem;
     color: var(--ct-muted) !important;
     font-size: 0.85rem;
     font-weight: 600;
 }
 
-/* Search bar + add button row */
-.toolbar {
-    display: flex;
-    gap: 0.75rem;
+/* Full-width search bar */
+.search-row {
     margin-bottom: 1.25rem;
-}
-
-.toolbar .input-group {
-    flex: 1;
 }
 
 /* ---------- Form fields (same treatment as login) ---------- */
@@ -291,9 +287,10 @@ main.contacts-shell {
     transform: translateY(0);
 }
 
-.toolbar .btn-primary {
-    padding-inline: 1.15rem;
+#addContactButton {
+    padding: 0.65rem 1.15rem !important;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .contacts-page .modal .btn-primary,
@@ -456,13 +453,34 @@ main.contacts-shell {
     gap: 0.35rem;
     padding: 0.55rem 0.85rem;
     border-radius: 0.65rem;
+}
+
+/* Error (red) */
+#contactAddResult.text-danger-wcag,
+#editContactResult.text-danger-wcag {
     background: #fbeae9;
+    color: #b3261e !important;
+}
+
+/* Missing-fields warning (amber) */
+#contactAddResult.text-warning,
+#editContactResult.text-warning {
+    background: #fbf1dc;
+    color: #8a5a00 !important;
+}
+
+/* Success (green) */
+#contactAddResult.text-success-wcag,
+#editContactResult.text-success-wcag {
+    background: #e9f6ec;
+    color: #1e7a34 !important;
 }
 
 /* ---------- Small screens ---------- */
 @media (max-width: 576px) {
-    .toolbar {
-        flex-direction: column;
+    /* On phones the button is just the icon, so it fits next to the title */
+    #addContactButton span {
+        display: none;
     }
 
     .user-pill {
