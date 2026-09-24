@@ -34,8 +34,8 @@ switch($method){
             $stml->bind_param("i", $userId);
         } else {
             $param = "%" . $search . "%";
-            $stml = $conn->prepare("SELECT ID, FirstName, LastName, Phone, Email FROM Contacts WHERE UserID = ? AND (FirstName LIKE ? OR LastName LIKE ?)");
-            $stml->bind_param("iss", $userId, $param, $param);
+            $stml = $conn->prepare("SELECT ID, FirstName, LastName, Phone, Email FROM Contacts WHERE UserID = ? AND (FirstName LIKE ? OR LastName LIKE ? OR CONCAT(FirstName, ' ', LastName) LIKE ? OR Email Like ? OR Phone LIKE ?)");
+            $stml->bind_param("isssss", $userId, $param, $param, $param, $param, $param);
         }
 
         $stml->execute();
