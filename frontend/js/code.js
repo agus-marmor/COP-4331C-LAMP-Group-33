@@ -49,8 +49,9 @@ function performLogin(login, password) {
           userId = jsonObject.id;
 
           if (userId < 1) {
+            let message = jsonObject.error || "User/Password combination incorrect";
             document.getElementById("loginResult").innerHTML =
-              "<i class='bi bi-exclamation-circle-fill me-1'></i> User/Password combination incorrect";
+              "<i class='bi bi-exclamation-circle-fill me-1'></i> " + escapeHtml(message);
             return;
           }
 
