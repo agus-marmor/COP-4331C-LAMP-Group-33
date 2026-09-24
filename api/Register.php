@@ -28,7 +28,9 @@ if($connection->connect_error){
 
 // not sure if necessary, wanted more security
 $hashedPassword = password_hash($inData["password"], PASSWORD_DEFAULT);
-$role = isset($inData["role"]) && !empty($inData["role"]) ? $inData["role"] : "user";
+
+$role = "user";
+
 //prepare sql template
 $stmt = $connection->prepare("INSERT INTO Users (FirstName, LastName, Login, Password, role) VALUES  (?, ?, ?, ?, ?)");
 
