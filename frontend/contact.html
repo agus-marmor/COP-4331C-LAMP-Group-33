@@ -19,6 +19,15 @@
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function () {
             readCookie();
+
+            // Every time the Add Contact popup opens, start fresh:
+            // empty boxes and no leftover message from last time.
+            document.getElementById('addContactModal').addEventListener('show.bs.modal', function () {
+                document.getElementById('addContactForm').reset();
+                let resultEl = document.getElementById('contactAddResult');
+                resultEl.innerHTML = '';
+                resultEl.className = 'small fw-semibold';
+            });
         }, false);
     </script>
 </head>
@@ -50,24 +59,28 @@
 
         <!-- Main panel -->
         <section id="accessUIDiv" class="contacts-panel glass-card">
+            <!-- Title + count on the left, Add contact on the right -->
             <div class="panel-heading">
-                <h2 class="panel-title">Your contacts</h2>
-                <span id="contactSearchResult" aria-live="polite"></span>
+                <div>
+                    <h2 class="panel-title">Your contacts</h2>
+                    <span id="contactSearchResult" aria-live="polite"></span>
+                </div>
+                <button type="button" id="addContactButton" aria-label="Add contact"
+                    class="buttons btn btn-primary d-flex align-items-center justify-content-center gap-2"
+                    data-bs-toggle="modal" data-bs-target="#addContactModal">
+                    <i class="bi bi-person-plus"></i>
+                    <span>Add contact</span>
+                </button>
             </div>
 
-            <div class="toolbar">
+            <!-- Search gets its own full-width row so nothing next to it looks like a search button -->
+            <div class="search-row">
                 <label for="searchText" class="visually-hidden">Search contacts</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
                     <input type="search" id="searchText" class="form-control" placeholder="Search contacts…"
                         onkeyup="if (event.key === 'Enter') searchContact();" />
                 </div>
-                <button type="button" id="addContactButton"
-                    class="buttons btn btn-primary d-flex align-items-center justify-content-center gap-2"
-                    data-bs-toggle="modal" data-bs-target="#addContactModal">
-                    <i class="bi bi-person-plus"></i>
-                    <span>Add contact</span>
-                </button>
             </div>
 
             <div id="contactList"></div>
