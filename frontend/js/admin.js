@@ -18,11 +18,13 @@
       values to match.
    ============================================================ */
 
-const adminUsersUrl = '/api/AdminUsers.php';          // GET (search), placeholder name
-const adminDisableUrl = '/api/AdminSetDisabled.php';  // POST, placeholder name
-const adminPasswordUrl = '/api/AdminChangePassword.php'; // POST, placeholder name
-const adminCreateUrl = '/api/AdminCreateAdmin.php';   // POST, placeholder name
-const adminUserContactsUrl = '/api/AdminUserContacts.php'; // GET, placeholder name
+   //updated with back end expected api call
+
+const adminUsersUrl = '/api/Admin.php?action=users';
+const adminDisableUrl = '/api/Admin.php?action=disable';
+const adminPasswordUrl = '/api/Admin.php?action=password';
+const adminCreateUrl = '/api/Admin.php?action=create';
+const adminUserContactsUrl = '/api/Admin.php?action=contacts';
 
 let usersCache = {};
 
@@ -323,7 +325,7 @@ function searchUserContacts() {
     let targetDiv = document.getElementById("userContactList");
     let emptyDiv = document.getElementById("userContactEmpty");
 
-    let url = adminUserContactsUrl + "?userId=" + encodeURIComponent(id) +
+    let url = adminUserContactsUrl + "&userId=" + encodeURIComponent(id) +
         (srch ? ("&q=" + encodeURIComponent(srch)) : "");
 
     let xhr = new XMLHttpRequest();
