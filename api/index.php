@@ -137,7 +137,7 @@ switch($method){
             echo json_encode(["error" => ""]);
         } else {
             http_response_code(500);
-            echo json_encode("errpr" => "Failed to update contact");
+            echo json_encode(["error" => "Failed to update contact"]);
         }
         
         $stmp->close();
