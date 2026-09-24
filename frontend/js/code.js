@@ -438,8 +438,7 @@ function deleteContactFromModal() {
 function deleteContact(identifier) {
   if (!identifier && identifier !== 0) return;
 
-  let param = (typeof identifier === 'number') ? ("id=" + identifier) : ("name=" + encodeURIComponent(identifier));
-  let url = urlBase + "?" + param;
+  let url = urlBase + "?id=" + encodeURIComponent(identifier);
 
   let xhr = new XMLHttpRequest();
   xhr.open("DELETE", url, true);

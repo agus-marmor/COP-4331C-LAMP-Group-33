@@ -81,7 +81,7 @@ function searchUsers() {
     let resultSpan = document.getElementById("userSearchResult");
     resultSpan.innerHTML = "";
 
-    let url = adminUsersUrl + (srch ? ("?q=" + encodeURIComponent(srch)) : "");
+    let url = adminUsersUrl + (srch ? ("&q=" + encodeURIComponent(srch)) : "");
 
     let xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
