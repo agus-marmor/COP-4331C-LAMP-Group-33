@@ -5,6 +5,7 @@ const registerUrlBase = '/api/Register.php';
 let userId = 0;
 let firstName = "";
 let lastName = "";
+let role = "";
 let contactsCache = {};
 
 // Escape text before putting it into innerHTML, so a contact named
@@ -32,6 +33,7 @@ function performLogin(login, password) {
   userId = 0;
   firstName = "";
   lastName = "";
+  role = "";
 
   let jsonPayload = JSON.stringify({ login: login, password: password });
 
@@ -53,9 +55,10 @@ function performLogin(login, password) {
 
           firstName = jsonObject.firstName;
           lastName = jsonObject.lastName;
+          role = jsonObject.role || "user";
 
           saveCookie();
-          window.location.href = "contact.html";
+          window.location.href = (role === "admin") ? "admin.html" : "contact.html";
         } else {
           document.getElementById("loginResult").innerHTML =
             "<i class='bi bi-exclamation-circle-fill me-1'></i> Login failed";
@@ -140,6 +143,8 @@ function saveCookie() {
     encodeURIComponent(lastName) +
     ",userId=" +
     userId +
+    ",role=" +
+    encodeURIComponent(role) +
     ";expires=" +
     date.toGMTString() +
     ";path=/";
@@ -160,10 +165,22 @@ function readCookie() {
         lastName = decodeURIComponent(keyVal[1] || "");
       } else if (keyVal[0] === "userId") {
         userId = parseInt(keyVal[1].trim());
+      } else if (keyVal[0] === "role") {
+        role = decodeURIComponent(keyVal[1] || "");
       }
     }
   }
 
+  if (userId < 0 || isNaN(userId)) {
+    window.location.href = "index.html";
+  } else {
+    let userNameEl = document.getElementById("userName");
+    if (userNameEl) {
+      userNameEl.innerHTML = `<i class="bi bi-person-circle me-1"></i> Logged in as <strong>${escapeHtml(firstName)} ${escapeHtml(lastName)}</strong>`;
+    }
+    searchContact();
+  }
+}
   if (userId < 0 || isNaN(userId)) {
     window.location.href = "index.html";
   } else {
@@ -179,9 +196,11 @@ function doLogout() {
   userId = 0;
   firstName = "";
   lastName = "";
+  role = "";
   document.cookie = "firstName=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
   document.cookie = "lastName=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
   document.cookie = "userId=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+  document.cookie = "role=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
   window.location.href = "index.html";
 }
 
