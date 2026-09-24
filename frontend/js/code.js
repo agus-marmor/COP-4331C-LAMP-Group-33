@@ -181,16 +181,6 @@ function readCookie() {
     searchContact();
   }
 }
-  if (userId < 0 || isNaN(userId)) {
-    window.location.href = "index.html";
-  } else {
-    let userNameEl = document.getElementById("userName");
-    if (userNameEl) {
-      userNameEl.innerHTML = `<i class="bi bi-person-circle me-1"></i> Logged in as <strong>${escapeHtml(firstName)} ${escapeHtml(lastName)}</strong>`;
-    }
-    searchContact();
-  }
-}
 
 function doLogout() {
   userId = 0;
