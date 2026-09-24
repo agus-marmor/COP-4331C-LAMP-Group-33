@@ -78,8 +78,16 @@
                 <label for="searchText" class="visually-hidden">Search contacts</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <!-- oninput runs every time the text changes (typing, deleting, or clicking the X).
+                         searchAsYouType() waits until you pause typing, then searches.
+                         Enter and the Search button still search right away. -->
                     <input type="search" id="searchText" class="form-control" placeholder="Search contacts…"
-                        onkeyup="if (event.key === 'Enter') searchContact();" />
+                        autocomplete="off"
+                        onkeyup="if (event.key === 'Enter') searchContact();"
+                        oninput="searchAsYouType();" />
+                    <button type="button" id="searchContactButton" class="btn btn-search" onclick="searchContact();">
+                        Search
+                    </button>
                 </div>
             </div>
 

@@ -256,11 +256,29 @@ function addContact() {
   }
 }
 
+// ---------- Search as you type ----------
+// If we searched on every single keystroke, typing "maya" would send 4
+// requests to the server. Instead we wait until the user stops typing for
+// 250 milliseconds (a quarter of a second), then send just one.
+let searchTimer = null;
+
+function searchAsYouType() {
+  clearTimeout(searchTimer);                   // cancel the search we were about to do...
+  searchTimer = setTimeout(searchContact, 250); // ...and schedule a new one
+}
+
+// Each search gets a number. If an older search's answer arrives after a
+// newer one (the network isn't always in order), we ignore the old answer
+// so the list never "jumps back" to stale results.
+let latestSearchId = 0;
+
 function searchContact() {
+  clearTimeout(searchTimer); // Enter or the button searches now, so skip any pending one
+  let mySearchId = ++latestSearchId;
+
   let srchInput = document.getElementById("searchText");
   let srch = srchInput ? srchInput.value.trim() : "";
   let resultSpan = document.getElementById("contactSearchResult");
-  resultSpan.innerHTML = "";
 
   let url = urlBase + (srch ? ("?q=" + encodeURIComponent(srch)) : "");
 
@@ -272,6 +290,7 @@ function searchContact() {
   try {
     xhr.onreadystatechange = function () {
       if (this.readyState === 4 && this.status === 200) {
+        if (mySearchId !== latestSearchId) return; // a newer search is on its way; ignore this one
         let jsonObject = JSON.parse(xhr.responseText);
         let targetDiv = document.getElementById("contactList");
         let contacts = jsonObject.contacts || [];
@@ -288,6 +307,15 @@ function searchContact() {
         }
 
         resultSpan.innerHTML = contacts.length + (contacts.length === 1 ? " contact" : " contacts");
+
+        // Put contacts in alphabetical order by first name, then last name.
+        // localeCompare compares two strings the way a dictionary would;
+        // sensitivity "base" makes "anna" and "Anna" count as the same.
+        contacts.sort(function (a, b) {
+          let nameA = (a.firstName || "") + " " + (a.lastName || "");
+          let nameB = (b.firstName || "") + " " + (b.lastName || "");
+          return nameA.localeCompare(nameB, undefined, { sensitivity: "base" });
+        });
 
         let rows = "";
         for (let i = 0; i < contacts.length; i++) {
