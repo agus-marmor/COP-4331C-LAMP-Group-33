@@ -1,24 +1,10 @@
 /* ============================================================
    admin.js — Admin dashboard logic
-   Written to match the patterns already used in code.js:
-   XMLHttpRequest (not fetch), cookie-based session info, and
-   Authorization: Bearer <userId> / X-User-Id headers on every
-   authenticated call.
+   Same patterns as code.js: XMLHttpRequest, cookie-based session
+   info, Authorization: Bearer <userId> / X-User-Id headers.
 
-   IMPORTANT — depends on two things not yet in the repo:
-   1. code.js's saveCookie()/readCookie() only store firstName,
-      lastName, userId. They need to also store `role` (from the
-      Login.php response, which already returns it) so this page
-      can tell an admin from a regular user. Until that's added,
-      readAdminCookie() below falls back to calling a "WhoAmI"
-      check — see the TODO in readAdminCookie().
-   2. The five admin API endpoints referenced below don't exist
-      in api/ yet. Names here are placeholders — confirm the real
-      ones with whoever builds the backend and update urlBase
-      values to match.
+   Backend: api/Admin.php, routed by ?action=
    ============================================================ */
-
-   //updated with back end expected api call
 
 const adminUsersUrl = '/api/Admin.php?action=users';
 const adminDisableUrl = '/api/Admin.php?action=disable';
@@ -28,9 +14,7 @@ const adminUserContactsUrl = '/api/Admin.php?action=contacts';
 
 let usersCache = {};
 
-/* ---------- Auth / page guard ----------
-   Mirrors readCookie() in code.js, but also confirms role === "admin"
-   before letting the page render, and bounces non-admins to contact.html. */
+/* ---------- Auth / page guard ---------- */
 function readAdminCookie() {
     userId = -1;
     let data = document.cookie;
@@ -49,8 +33,6 @@ function readAdminCookie() {
             } else if (keyVal[0] === "userId") {
                 userId = parseInt(keyVal[1].trim());
             } else if (keyVal[0] === "role") {
-                // TODO: this key won't exist until saveCookie() in code.js is
-                // updated to also save role after login.
                 role = decodeURIComponent(keyVal[1] || "");
             }
         }
@@ -62,15 +44,12 @@ function readAdminCookie() {
     }
 
     if (role !== "admin") {
-        // Either a regular user hit this page directly, or the role cookie
-        // doesn't exist yet because saveCookie() hasn't been updated.
         window.location.href = "contact.html";
         return;
     }
 
-    document.getElementById("userName").innerHTML =
-        `<i class="bi bi-person-circle me-1 text-primary"></i> <span>${firstName} ${lastName}</span>`;
-
+    // Account menu name/initials are filled in by the inline script
+    // in admin.html, same split contact.html uses.
     searchUsers();
 }
 
@@ -105,18 +84,25 @@ function searchUsers() {
     }
 }
 
+/* Reuses contacts.css's .contact-row / .contact-avatar / .contact-name /
+   .contact-meta / .btn-edit classes directly — same visual component,
+   just filled with user data (login, role, status) instead of a
+   contact's phone/email. */
 function renderUsers(users) {
-    let tbody = document.getElementById("userTableBody");
+    let listDiv = document.getElementById("userList");
     let emptyDiv = document.getElementById("userListEmpty");
+    let resultSpan = document.getElementById("userSearchResult");
 
     usersCache = {};
 
     if (users.length === 0) {
-        tbody.innerHTML = "";
+        listDiv.innerHTML = "";
         emptyDiv.classList.remove("d-none");
+        resultSpan.textContent = "";
         return;
     }
     emptyDiv.classList.add("d-none");
+    resultSpan.textContent = users.length + (users.length === 1 ? " user" : " users");
 
     let rows = "";
     for (let i = 0; i < users.length; i++) {
@@ -124,28 +110,34 @@ function renderUsers(users) {
         usersCache[u.id] = u;
         let isDisabled = Number(u.disabled) === 1;
         let isSelf = u.id === userId;
+        let initials = ((u.firstName || "?").charAt(0) + (u.lastName || "").charAt(0)).toUpperCase();
 
-        rows += `<tr>
-      <td class="fw-medium">${u.firstName} ${u.lastName}</td>
-      <td>${u.login}</td>
-      <td><span class="role-pill role-${u.role === 'admin' ? 'admin' : 'user'}">${u.role}</span></td>
-      <td><span class="status-pill ${isDisabled ? 'status-disabled' : 'status-active'}">${isDisabled ? 'Disabled' : 'Active'}</span></td>
-      <td class="text-end">
-        <button type="button" class="buttons btn btn-sm btn-outline-secondary me-1" onclick="openViewContacts(${u.id});" title="View Contacts">
-          <i class="bi bi-person-lines-fill"></i>
-        </button>
-        <button type="button" class="buttons btn btn-sm btn-outline-secondary me-1" onclick="openChangePassword(${u.id});" title="Change Password">
-          <i class="bi bi-key"></i>
-        </button>
-        <button type="button" class="buttons btn btn-sm ${isDisabled ? 'btn-outline-success' : 'btn-outline-danger'}"
-          onclick="toggleDisabled(${u.id}, ${isDisabled ? 'false' : 'true'});"
-          ${isSelf ? 'disabled title="You can\'t disable your own account"' : ''}>
-          <i class="bi ${isDisabled ? 'bi-check-circle' : 'bi-slash-circle'}"></i> ${isDisabled ? 'Enable' : 'Disable'}
-        </button>
-      </td>
-    </tr>`;
+        rows += `<div class="contact-row">
+      <span class="contact-avatar" aria-hidden="true">${initials}</span>
+      <div class="contact-info">
+        <span class="contact-name">
+          ${u.firstName} ${u.lastName}
+          <span class="pill-row ${u.role === 'admin' ? 'pill-role-admin' : 'pill-role-user'}">${u.role}</span>
+          <span class="pill-row ${isDisabled ? 'pill-status-disabled' : 'pill-status-active'}">${isDisabled ? 'Disabled' : 'Active'}</span>
+        </span>
+        <div class="contact-meta"><span><i class="bi bi-person"></i>${u.login}</span></div>
+      </div>
+      <button type="button" class="btn-edit" onclick="openViewContacts(${u.id});" title="View contacts" aria-label="View ${u.firstName} ${u.lastName}'s contacts">
+        <i class="bi bi-person-lines-fill"></i>
+      </button>
+      <button type="button" class="btn-edit" onclick="openChangePassword(${u.id});" title="Change password" aria-label="Change password for ${u.firstName} ${u.lastName}">
+        <i class="bi bi-key"></i>
+      </button>
+      <button type="button" class="btn-edit ${isDisabled ? 'btn-edit-success' : 'btn-edit-danger'}"
+        onclick="toggleDisabled(${u.id}, ${isDisabled ? 'false' : 'true'});"
+        title="${isDisabled ? 'Enable user' : 'Disable user'}"
+        aria-label="${isDisabled ? 'Enable' : 'Disable'} ${u.firstName} ${u.lastName}"
+        ${isSelf ? 'disabled title="You can\'t disable your own account"' : ''}>
+        <i class="bi ${isDisabled ? 'bi-check-circle' : 'bi-slash-circle'}"></i>
+      </button>
+    </div>`;
     }
-    tbody.innerHTML = rows;
+    listDiv.innerHTML = rows;
 }
 
 /* ---------- Disable / enable (never delete) ---------- */
@@ -189,9 +181,10 @@ function submitPasswordChange() {
     let resultEl = document.getElementById("passwordChangeResult");
     let spinner = document.getElementById("passwordSaveSpinner");
     resultEl.innerHTML = "";
+    resultEl.className = "small fw-semibold";
 
     if (!password || password.length < 8) {
-        resultEl.className = "text-warning small fw-semibold";
+        resultEl.className = "small fw-semibold text-warning";
         resultEl.innerHTML = "<i class='bi bi-exclamation-triangle-fill me-1'></i> Use at least 8 characters";
         return;
     }
@@ -209,7 +202,7 @@ function submitPasswordChange() {
             if (this.readyState === 4) {
                 spinner.classList.add("d-none");
                 if (this.status === 200) {
-                    resultEl.className = "text-success-wcag small fw-semibold";
+                    resultEl.className = "small fw-semibold text-success-wcag";
                     resultEl.innerHTML = "<i class='bi bi-check-circle-fill me-1'></i> Password updated";
                     setTimeout(() => {
                         let modalEl = document.getElementById("changePasswordModal");
@@ -219,10 +212,10 @@ function submitPasswordChange() {
                 } else {
                     try {
                         let res = JSON.parse(xhr.responseText);
-                        resultEl.className = "text-danger-wcag small fw-semibold";
+                        resultEl.className = "small fw-semibold text-danger-wcag";
                         resultEl.innerHTML = res.error || "Failed to update password";
                     } catch (e) {
-                        resultEl.className = "text-danger-wcag small fw-semibold";
+                        resultEl.className = "small fw-semibold text-danger-wcag";
                         resultEl.innerHTML = "Error updating password";
                     }
                 }
@@ -244,14 +237,15 @@ function submitCreateAdmin() {
     let resultEl = document.getElementById("createAdminResult");
     let spinner = document.getElementById("createAdminSpinner");
     resultEl.innerHTML = "";
+    resultEl.className = "small fw-semibold";
 
     if (!firstNameVal || !lastNameVal || !loginVal || !passwordVal) {
-        resultEl.className = "text-warning small fw-semibold";
+        resultEl.className = "small fw-semibold text-warning";
         resultEl.innerHTML = "<i class='bi bi-exclamation-triangle-fill me-1'></i> All fields are required";
         return;
     }
     if (passwordVal.length < 8) {
-        resultEl.className = "text-warning small fw-semibold";
+        resultEl.className = "small fw-semibold text-warning";
         resultEl.innerHTML = "<i class='bi bi-exclamation-triangle-fill me-1'></i> Use at least 8 characters";
         return;
     }
@@ -269,7 +263,7 @@ function submitCreateAdmin() {
             if (this.readyState === 4) {
                 spinner.classList.add("d-none");
                 if (this.status === 201 || this.status === 200) {
-                    resultEl.className = "text-success-wcag small fw-semibold";
+                    resultEl.className = "small fw-semibold text-success-wcag";
                     resultEl.innerHTML = "<i class='bi bi-check-circle-fill me-1'></i> Admin created";
                     document.getElementById("createAdminForm").reset();
                     searchUsers();
@@ -281,10 +275,10 @@ function submitCreateAdmin() {
                 } else {
                     try {
                         let res = JSON.parse(xhr.responseText);
-                        resultEl.className = "text-danger-wcag small fw-semibold";
+                        resultEl.className = "small fw-semibold text-danger-wcag";
                         resultEl.innerHTML = res.error || "Failed to create admin";
                     } catch (e) {
-                        resultEl.className = "text-danger-wcag small fw-semibold";
+                        resultEl.className = "small fw-semibold text-danger-wcag";
                         resultEl.innerHTML = "Error creating admin";
                     }
                 }
@@ -308,7 +302,7 @@ function openViewContacts(id) {
     if (!u) return;
 
     document.getElementById("viewContactsUserId").value = id;
-    document.getElementById("viewContactsModalLabel").textContent = `${u.firstName} ${u.lastName}'s contacts`;
+    document.getElementById("viewContactsModalLabel").textContent = u.firstName + " " + u.lastName + "'s contacts";
     document.getElementById("userContactSearchText").value = "";
 
     let modalEl = document.getElementById("viewContactsModal");
@@ -349,10 +343,14 @@ function searchUserContacts() {
                 let rows = "";
                 for (let i = 0; i < contacts.length; i++) {
                     let c = contacts[i];
-                    rows += `<div class="contact-chip">
-            <span class="contact-name">${c.firstName} ${c.lastName}</span>
-            <span class="text-secondary-contrast small ms-2">${c.phone || ''}</span>
-            <span class="text-secondary-contrast small ms-2">${c.email || ''}</span>
+                    rows += `<div class="contact-row">
+            <div class="contact-info">
+              <span class="contact-name">${c.firstName} ${c.lastName}</span>
+              <div class="contact-meta">
+                <span><i class="bi bi-envelope"></i>${c.email || ''}</span>
+                <span><i class="bi bi-telephone"></i>${c.phone || ''}</span>
+              </div>
+            </div>
           </div>`;
                 }
                 targetDiv.innerHTML = rows;
