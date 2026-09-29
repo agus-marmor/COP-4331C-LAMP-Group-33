@@ -460,3 +460,50 @@ input:focus-visible,
         font-size: 1.6rem;
     }
 }
+
+/* ---------- 13. Show/hide password eye button ----------
+   The button itself is added by addPasswordToggles() in code.js. */
+.password-field {
+    position: relative;
+}
+
+/* Leave room on the right so typed text never goes under the eye.
+   "body ... .has-password-toggle" is extra-specific so it beats the
+   page files (login.css, contacts.css) that also set padding. */
+body input.form-control.has-password-toggle {
+    padding-right: 2.9rem !important;
+}
+
+/* Edge browsers add their own eye; hide it so there aren't two */
+input.has-password-toggle::-ms-reveal {
+    display: none;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 0.45rem;
+    transform: translateY(-50%);
+    z-index: 6; /* above the box, even when the box is focused */
+    width: 2.1rem;
+    height: 2.1rem;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 0.55rem;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.password-toggle:hover {
+    background: rgba(10, 92, 56, 0.1);
+    color: #0a5c38;
+}
+
+.password-toggle[aria-pressed="true"] {
+    color: #0a5c38;
+}

@@ -525,3 +525,70 @@ function changePassword() {
 
   xhr.send(jsonPayload);
 }
+
+// ---------- Show/hide password (eye button) ----------
+// Runs once on every page that loads code.js (login, contacts, admin).
+// It finds every password box and adds an eye button inside its right edge,
+// so none of the HTML files need to be changed.
+function addPasswordToggles() {
+  let passwordInputs = document.querySelectorAll('input[type="password"]');
+
+  passwordInputs.forEach(function (input) {
+    // The eye button is positioned relative to a container around the box.
+    // Boxes inside an input-group (like the login page) already have one.
+    // Other boxes get wrapped in a new <div class="password-field">.
+    let container = input.parentElement;
+    if (!container.classList.contains("input-group")) {
+      let wrapper = document.createElement("div");
+      wrapper.className = "password-field";
+      input.parentNode.insertBefore(wrapper, input); // put the wrapper where the box was...
+      wrapper.appendChild(input);                     // ...then move the box inside it
+      container = wrapper;
+    }
+    input.classList.add("has-password-toggle"); // leaves room on the right for the eye
+
+    let button = document.createElement("button");
+    button.type = "button"; // type="button" so clicking it doesn't submit the form
+    button.className = "password-toggle";
+    button.setAttribute("aria-label", "Show password");
+    button.setAttribute("aria-pressed", "false");
+    button.innerHTML = '<i class="bi bi-eye" aria-hidden="true"></i>';
+
+    button.addEventListener("click", function () {
+      setPasswordVisible(input, input.type === "password");
+      input.focus(); // keep typing where you were
+    });
+
+    container.appendChild(button);
+  });
+
+  // Hide passwords again whenever a form is cleared or a popup closes,
+  // so a password never stays visible after you walk away from it.
+  document.addEventListener("reset", function (event) {
+    hideAllPasswords(event.target);
+  }, true);
+  document.addEventListener("hidden.bs.modal", function (event) {
+    hideAllPasswords(event.target);
+  });
+}
+
+// visible = true shows the password as text, false turns it back into dots
+function setPasswordVisible(input, visible) {
+  input.type = visible ? "text" : "password";
+
+  let button = input.parentElement.querySelector(".password-toggle");
+  if (!button) return;
+  button.setAttribute("aria-label", visible ? "Hide password" : "Show password");
+  button.setAttribute("aria-pressed", visible ? "true" : "false");
+  button.innerHTML = visible
+    ? '<i class="bi bi-eye-slash" aria-hidden="true"></i>'
+    : '<i class="bi bi-eye" aria-hidden="true"></i>';
+}
+
+function hideAllPasswords(area) {
+  area.querySelectorAll("input.has-password-toggle").forEach(function (input) {
+    setPasswordVisible(input, false);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", addPasswordToggles);
