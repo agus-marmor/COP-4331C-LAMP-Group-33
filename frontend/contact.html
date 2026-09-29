@@ -20,6 +20,12 @@
         document.addEventListener('DOMContentLoaded', function () {
             readCookie();
 
+            // Admins came here from the admin dashboard, so give them a way back.
+            // (readCookie() has already filled in role from the login cookie.)
+            if (role === 'admin') {
+                document.getElementById('adminBackLink').hidden = false;
+            }
+
             // Put your name and initials on the account menu button.
             // (readCookie() has already filled in firstName and lastName.)
             document.getElementById('accountName').textContent = firstName + ' ' + lastName;
@@ -57,6 +63,12 @@
 
     <main class="contacts-shell">
         <!-- Header: logo + title on the left, logged-in user + logout on the right -->
+        <!-- Only admins see this. It starts hidden; the script at the top
+             un-hides it when the logged-in user's role is "admin". -->
+        <a href="admin.html" id="adminBackLink" class="back-link" hidden>
+            <i class="bi bi-arrow-left" aria-hidden="true"></i> Back to admin dashboard
+        </a>
+
         <header class="contacts-header">
             <div class="contacts-brand">
                 <div class="contacts-mark" aria-hidden="true">

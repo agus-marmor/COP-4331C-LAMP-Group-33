@@ -95,6 +95,45 @@ main.contacts-shell {
     margin-bottom: 1.5rem;
 }
 
+/* "Back to admin dashboard" link above the header (admins only) */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 1rem;
+    padding: 0.4rem 0.9rem 0.4rem 0.75rem;
+    background: var(--ct-surface);
+    border: 1px solid var(--ct-border);
+    border-radius: 999px;
+    color: var(--ct-brand);
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+
+.back-link:hover {
+    background: var(--ct-brand-soft);
+    border-color: rgba(10, 92, 56, 0.3);
+    color: var(--ct-brand-deep);
+}
+
+/* Nudge the arrow left on hover, like it's pointing the way */
+.back-link:hover .bi {
+    transform: translateX(-2px);
+}
+
+.back-link .bi {
+    transition: transform 150ms ease;
+}
+
+/* The hidden attribute must win over display: inline-flex above */
+.back-link[hidden] {
+    display: none;
+}
+
 .contacts-brand {
     display: flex;
     align-items: center;
