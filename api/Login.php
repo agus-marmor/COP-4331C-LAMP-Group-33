@@ -36,7 +36,7 @@ $row = $result->fetch_assoc();
 // error check then send data to client
 if($row && password_verify($inDataL["password"], $row["Password"])){
     if ($row["isDisabled"] == 1){
-        http_response_code(200);
+        http_response_code(403);
         echo json_encode([
             "id" => 0,
             "firstName" => "",
